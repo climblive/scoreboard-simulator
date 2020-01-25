@@ -111,7 +111,10 @@ class ContenderSimulator(object):
                 comp_class = self.switch_class()
                 self.log("Changed class to %s" % (comp_class["name"]))
 
-            time.sleep(random.random() * DELAY_MULTIPLIER)
+            total_sleep = random.random() * DELAY_MULTIPLIER
+            while total_sleep > 0 and not PLEASE_EXIT:
+                time.sleep(1.0)
+                total_sleep -= 1.0
 
     def log(self, message):
         print("[%s] %s" % (self.registration_code, message))
