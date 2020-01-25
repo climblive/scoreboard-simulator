@@ -60,6 +60,7 @@ class Action(Enum):
     AddTick = 1
     RemoveTick = 2
     SwitchClass = 3
+    UpdateTick = 4
 
 
 class ContenderSimulator(object):
@@ -94,7 +95,7 @@ class ContenderSimulator(object):
         self.load_data()
         self.enter_contest()
 
-        actions = [Action.AddTick] * 50 + [Action.RemoveTick] * 50 + [Action.SwitchClass] * 1
+        actions = [Action.AddTick] * 45 + [Action.UpdateTick] * 10 + [Action.RemoveTick] * 45 + [Action.SwitchClass] * 1
 
         while not PLEASE_EXIT:
             total_sleep = random.random() * DELAY_MULTIPLIER
@@ -111,7 +112,11 @@ class ContenderSimulator(object):
             elif action == Action.AddTick:
                 added_problem = self.add_tick()
                 if added_problem:
-                    self.log("Added tick of problem %d" % (added_problem,))
+                    self.log("Added tick for problem %d" % (added_problem,))
+            elif action == Action.UpdateTick:
+                updated_problem = self.update_tick()
+                if updated_problem:
+                    self.log("Updated tick for problem %d" % (updated_problem,))
             elif action == Action.SwitchClass:
                 comp_class = self.switch_class()
                 self.log("Changed class to %s" % (comp_class["name"]))
@@ -175,6 +180,18 @@ class ContenderSimulator(object):
         self.problems_todo.remove(problem_id)
         self.problems_ticked.append(problem_id)
         self.ticks[problem_id] = tick
+
+        return problem_id
+
+    def update_tick(self):
+        if len(self.problems_ticked) == 0:
+            return None
+
+        problem_id = random.choice(self.problems_ticked)
+        tick = self.ticks[problem_id]
+        tick["isFlash"] = random.random() > 0.5
+
+        tick = self.request("PUT", "/tick/%d" % (tick["id"],), tick)
 
         return problem_id
 
