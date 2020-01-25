@@ -97,6 +97,11 @@ class ContenderSimulator(object):
         actions = [Action.AddTick] * 50 + [Action.RemoveTick] * 50 + [Action.SwitchClass] * 1
 
         while not PLEASE_EXIT:
+            total_sleep = random.random() * DELAY_MULTIPLIER
+            while total_sleep > 0 and not PLEASE_EXIT:
+                time.sleep(1.0)
+                total_sleep -= 1.0
+
             action = random.choice(actions)
 
             if action == Action.RemoveTick:
@@ -110,11 +115,6 @@ class ContenderSimulator(object):
             elif action == Action.SwitchClass:
                 comp_class = self.switch_class()
                 self.log("Changed class to %s" % (comp_class["name"]))
-
-            total_sleep = random.random() * DELAY_MULTIPLIER
-            while total_sleep > 0 and not PLEASE_EXIT:
-                time.sleep(1.0)
-                total_sleep -= 1.0
 
     def log(self, message):
         print("[%s] %s" % (self.registration_code, message))
